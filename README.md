@@ -1,174 +1,446 @@
 # vShield — Background Verification Platform
 
-vShield is an enterprise-grade, production-ready SaaS background verification platform designed for HR departments to automate candidate credential audits. The platform orchestrates secure validation pipelines calling mock Government ID APIs (Aadhaar & PAN), aggregates audit logs, and compiles PDF certificates using headless Puppeteer rendering.
+## Live Demo
+
+### Frontend (Vercel)
+
+[https://background-verification-platform-smcd-amafwcony.vercel.app](https://background-verification-platform-smcd-amafwcony.vercel.app)
+
+### Backend API (Render)
+
+[https://background-verification-platform-778v.onrender.com](https://background-verification-platform-778v.onrender.com)
 
 ---
 
-## Technical Stack & Architecture
+# Overview
 
-### Backend:
-* **Runtime:** Node.js (v20) + Express framework (TypeScript)
-* **Database:** PostgreSQL hosted on Neon Serverless, managed via Prisma ORM (v5.14.0)
-* **PDF Compiler:** Puppeteer Headless layout rendering
-* **Cloud Storage CDN:** Cloudinary SDK stream helper
+vShield is a full-stack enterprise-grade Background Verification Platform built to streamline candidate identity verification workflows for recruiters, HR teams, and organizations.
 
-### Frontend:
-* **Framework:** React + Vite + TypeScript
-* **Styling:** Tailwind CSS (Custom slate monochrome palette)
-* **State Management:** Zustand
-* **Form Validations:** React Hook Form + Zod resolvers
-* **Navigation Routing:** React Router DOM (v6)
+The platform enables secure candidate onboarding, Aadhaar and PAN verification workflows, verification audit logging, PDF report generation, and professional dashboard analytics.
+
+The project follows scalable SaaS architecture principles with modular backend services, secure authentication, REST APIs, relational database modeling, and production deployment.
 
 ---
 
-## Directory Structure
+# Features
+
+## Authentication & Security
+
+* JWT-based Authentication
+* User Registration & Login
+* Protected Routes
+* Password Hashing using bcrypt
+* Rate Limiting
+* Helmet Security Middleware
+* Secure CORS Configuration
+* Centralized Error Handling
+
+---
+
+## Candidate Management
+
+* Create Candidate Profiles
+* Edit Candidate Details
+* Delete Candidates
+* Search & Filter Candidates
+* Paginated Candidate Listing
+* Candidate Status Tracking
+
+---
+
+## Verification System
+
+### Aadhaar Verification
+
+* Aadhaar Number Validation
+* Verification Workflow Simulation
+* Verification Status Tracking
+
+### PAN Verification
+
+* PAN Format Validation
+* PAN Verification Workflow
+* Active/Inactive PAN Checks
+
+---
+
+## Verification Workflow Engine
+
+* Automated Verification Pipeline
+* Verification Audit Logs
+* Status Classification:
+
+  * VERIFIED
+  * FAILED
+  * PARTIAL
+  * PENDING
+
+---
+
+## Professional Reports
+
+* PDF Verification Report Generation
+* Report Storage & Retrieval
+* Cloudinary Integration
+* Downloadable Reports
+
+---
+
+## Dashboard & UI
+
+* Enterprise Dashboard UI
+* Verification Statistics
+* Status Cards
+* Responsive Design
+* Toast Notifications
+* Clean SaaS-style User Experience
+
+---
+
+# Tech Stack
+
+## Frontend
+
+* React.js
+* TypeScript
+* Vite
+* Tailwind CSS
+* Axios
+* Zustand
+* React Router DOM
+
+---
+
+## Backend
+
+* Node.js
+* Express.js
+* TypeScript
+* Prisma ORM
+* JWT Authentication
+* Zod Validation
+
+---
+
+## Database
+
+* PostgreSQL (Neon)
+
+---
+
+## Cloud & Deployment
+
+* Frontend: Vercel
+* Backend: Render
+* Database: Neon
+* File Storage: Cloudinary
+
+---
+
+# System Architecture
 
 ```text
-vShield/
-├── backend/
-│   ├── prisma/
-│   │   └── schema.prisma         # Prisma Schema models & relational configurations
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── cloudinary.ts     # Cloudinary asset integration stream helpers
-│   │   ├── controllers/
-│   │   │   ├── auth.controller.ts
-│   │   │   ├── candidate.controller.ts
-│   │   │   ├── report.controller.ts
-│   │   │   └── verification.controller.ts
-│   │   ├── lib/
-│   │   │   └── prisma.ts         # Singleton database client instantiation
-│   │   ├── middleware/
-│   │   │   ├── auth.middleware.ts
-│   │   │   └── error.middleware.ts
-│   │   ├── routes/
-│   │   │   ├── auth.routes.ts
-│   │   │   ├── candidate.routes.ts
-│   │   │   ├── report.routes.ts
-│   │   │   └── verification.routes.ts
-│   │   ├── services/
-│   │   │   ├── auth.service.ts
-│   │   │   ├── candidate.service.ts
-│   │   │   ├── pdf.service.ts     # Puppeteer PDF layout generator
-│   │   │   ├── report.service.ts
-│   │   │   └── verification.service.ts # Verification pipeline orchestrator
-│   │   ├── utils/
-│   │   │   └── errors.ts         # Centralized HTTP status error models
-│   │   ├── validations/
-│   │   │   ├── auth.validation.ts
-│   │   │   └── candidate.validation.ts
-│   │   ├── app.ts                # Express application bootstrapping & CORS configuration
-│   │   └── server.ts             # Server entry-point listener
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Card.tsx          # Reusable analytics metrics layout cards
-│   │   │   ├── Header.tsx        # Top status breadcrumbs navbar
-│   │   │   ├── Sidebar.tsx       # Sidebar navigation dashboard menu
-│   │   │   ├── Table.tsx         # Generic paginated table component
-│   │   │   └── Toast.tsx         # Slide-in global notifications component
-│   │   ├── layouts/
-│   │   │   └── DashboardLayout.tsx # Protected session layout router guard
-│   │   ├── pages/
-│   │   │   ├── CandidateCreateEdit.tsx # Zod-validated registration form page
-│   │   │   ├── CandidateDetails.tsx    # Candidate file detail panel & logs audit
-│   │   │   ├── CandidateList.tsx       # Searchable & filterable directory grid
-│   │   │   ├── Dashboard.tsx           # Workspaces metrics overview charts
-│   │   │   ├── Login.tsx               # Sign-in authentication form page
-│   │   │   ├── Register.tsx            # Sign-up account creation form page
-│   │   │   ├── ReportViewer.tsx        # Web-rendered credential assessment viewer
-│   │   │   └── VerificationLogs.tsx    # Audit logs expanded transaction logs
-│   │   ├── services/
-│   │   │   └── api.ts            # Axios interceptor configurations
-│   │   ├── store/
-│   │   │   ├── authStore.ts      # Zustand authentication actions & session state
-│   │   │   └── candidateStore.ts # Zustand candidate queries & metrics
-│   │   ├── types/
-│   │   │   └── index.ts          # Unified TypeScript interfaces
-│   │   ├── App.tsx               # React Router navigation tree
-│   │   ├── index.css             # Tailwind base styles and overrides
-│   │   └── main.tsx              # React mounting script
-│   ├── package.json
-│   ├── tailwind.config.js
-│   └── tsconfig.json
-└── vShield_Postman_Collection.json # Postman integration test requests collection
+Frontend (Vercel)
+        ↓
+Backend API (Render)
+        ↓
+PostgreSQL Database (Neon)
+        ↓
+Cloudinary File Storage
 ```
 
 ---
 
-## Installation & Local Configuration
+# Project Structure
 
-### 1. Database & Environments
-Copy or configure environmental credentials in a `/backend/.env` file:
+## Backend Structure
+
+```text
+backend/
+│
+├── prisma/
+├── src/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── routes/
+│   ├── services/
+│   ├── utils/
+│   ├── validations/
+│   ├── lib/
+│   ├── app.ts
+│   └── server.ts
+│
+├── package.json
+└── tsconfig.json
+```
+
+---
+
+## Frontend Structure
+
+```text
+frontend/
+│
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── layouts/
+│   ├── pages/
+│   ├── services/
+│   ├── store/
+│   ├── types/
+│   ├── App.tsx
+│   └── main.tsx
+│
+├── package.json
+└── vite.config.ts
+```
+
+---
+
+# Core Modules
+
+## Authentication Module
+
+### APIs
+
+```http
+POST /api/auth/register
+POST /api/auth/login
+GET /api/auth/me
+```
+
+---
+
+## Candidate Module
+
+### APIs
+
+```http
+GET    /api/candidates
+POST   /api/candidates
+GET    /api/candidates/:id
+PUT    /api/candidates/:id
+DELETE /api/candidates/:id
+```
+
+---
+
+## Verification Module
+
+### APIs
+
+```http
+POST /api/verifications/:id/start
+GET  /api/verifications/logs
+```
+
+---
+
+## Report Module
+
+### APIs
+
+```http
+GET /api/reports/:id
+GET /api/reports/details/:id
+```
+
+---
+
+# Database Schema
+
+## Main Entities
+
+* User
+* Candidate
+* VerificationLog
+* Report
+
+---
+
+# Security Features
+
+* JWT Authentication
+* Password Hashing
+* Request Rate Limiting
+* Secure CORS Policy
+* Input Validation
+* Centralized Error Middleware
+* Protected API Routes
+* Sensitive Data Handling
+
+---
+
+# Environment Variables
+
+## Backend `.env`
+
 ```env
-DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/neondb?sslmode=require
-JWT_SECRET=vshield_super_secure_jwt_secret_key_101
-PORT=5001
+DATABASE_URL=
 
-# Cloud Storage Credentials
-CLOUDINARY_CLOUD_NAME=dbmqdfp5t
-CLOUDINARY_API_KEY=252935166747232
-CLOUDINARY_API_SECRET=TY9GYD1ntsZQv1Uu2ve0yLk5PBo
+JWT_SECRET=
 
-# Gateway URLs (Leave blank to use sandbox mock response behaviors)
 AADHAAR_API_URL=
 PAN_API_URL=
 
-FRONTEND_URL=http://localhost:5173
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+FRONTEND_URL=
 ```
 
-### 2. Bootstrapping the Backend
-Navigate to `/backend` folder:
+---
+
+## Frontend `.env`
+
+```env
+VITE_API_URL=
+```
+
+---
+
+# Local Setup Instructions
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/cruzz77/Background_Verification_Platform.git
+```
+
+---
+
+## 2. Setup Backend
+
 ```bash
 cd backend
+
 npm install
-npx prisma db push       # Synchronize models with the Neon PostgreSQL database
-npm run build            # Compile TypeScript files
-npm run dev              # Run server under ts-node-dev on port 5001
 ```
 
-### 3. Bootstrapping the Frontend
-Navigate to `/frontend` folder:
+### Create `.env`
+
+```env
+DATABASE_URL=
+JWT_SECRET=
+FRONTEND_URL=
+```
+
+### Run Backend
+
 ```bash
-cd ../frontend
-npm install
-npm run build            # Compile & verify client assets
-npm run dev              # Launch development server on port 5173
+npm run dev
 ```
 
-Open `http://localhost:5173` on your browser to access the vShield application.
+---
+
+## 3. Setup Frontend
+
+```bash
+cd frontend
+
+npm install
+```
+
+### Create `.env`
+
+```env
+VITE_API_URL=http://localhost:5003/api
+```
+
+### Run Frontend
+
+```bash
+npm run dev
+```
 
 ---
 
-## API Documentation
+# Production Deployment
 
-### Authentication Routes
-* `POST /api/auth/register` - Create user profile
-* `POST /api/auth/login` - Authenticate profile and receive JWT token
-* `GET /api/auth/me` - Fetch logged-in user profile details
+## Frontend Deployment
 
-### Candidate Routes
-* `GET /api/candidates` - Search/page candidate filings
-* `POST /api/candidates` - Register a candidate filing profile
-* `GET /api/candidates/:id` - Fetch candidate records, logs, and reports
-* `PUT /api/candidates/:id` - Update candidate identity details
-* `DELETE /api/candidates/:id` - Delete candidate profile and related logs
+* Vercel
 
-### Verification Routes
-* `POST /api/verifications/:id/start` - Execute background Aadhaar + PAN verification pipelines
-* `GET /api/verifications/logs` - Audit system transactions
+## Backend Deployment
 
-### Report Routes
-* `GET /api/reports/:candidateId` - Fetch candidate digital assessment certificate
+* Render
+
+## Database Hosting
+
+* Neon PostgreSQL
+
+## File Storage
+
+* Cloudinary
 
 ---
 
-## Testing API Gateways via Postman
-A pre-configured Postman JSON collection is provided at the root folder `/vShield_Postman_Collection.json`. 
-To test:
-1. Import `vShield_Postman_Collection.json` into Postman.
-2. Select standard environment variables for port (`5001`) and host (`localhost`).
-3. Execute registration and login endpoints to automatically cache the authorization header token variable.
-4. Execute candidate filings and validation actions.
+# Assignment Requirements Covered
+
+| Requirement                 | Status |
+| --------------------------- | ------ |
+| Authentication System       | ✅      |
+| Candidate CRUD APIs         | ✅      |
+| Aadhaar Verification        | ✅      |
+| PAN Verification            | ✅      |
+| REST APIs                   | ✅      |
+| PostgreSQL Integration      | ✅      |
+| Prisma ORM                  | ✅      |
+| JWT Authentication          | ✅      |
+| PDF Report Generation       | ✅      |
+| Secure Backend Architecture | ✅      |
+| Responsive Frontend UI      | ✅      |
+| Deployment                  | ✅      |
+| Verification Workflow       | ✅      |
+| Audit Logging               | ✅      |
+
+---
+
+# Scalability Considerations
+
+* Modular Service Layer Architecture
+* RESTful API Design
+* ORM-based Database Access
+* Centralized Error Handling
+* Production-ready Deployment Architecture
+* Async-ready Verification Flow
+* Cloud-based Infrastructure
+
+---
+
+# Future Enhancements
+
+* OCR Document Upload
+* Face Match Verification
+* Email Notification System
+* Redis Caching
+* Queue-based Verification Workers
+* Admin Analytics Dashboard
+* Multi-tenant Architecture
+* Bulk CSV Upload
+* Webhook Integrations
+
+---
+
+# API Testing
+
+Postman Collection included:
+
+```text
+vShield_Postman_Collection.json
+```
+
+---
+
+# Author
+
+Built by [Aditya Chopra](https://github.com/cruzz77)
+
+---
+
+# License
+
+This project was developed as part of a Full Stack Engineering Assignment for educational and evaluation purposes.

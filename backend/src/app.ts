@@ -49,6 +49,20 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'vShield Verification API is running',
+  });
+});
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'vShield API',
+    uptime: process.uptime(),
+  });
+});
+
 app.use('/api', limiter);
 app.use(express.json());
 

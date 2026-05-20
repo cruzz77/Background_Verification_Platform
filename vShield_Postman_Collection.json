@@ -1,0 +1,443 @@
+{
+	"info": {
+		"_postman_id": "c8a4128f-7558-45a7-9878-3a95bfcf9a22",
+		"name": "vShield - Background Verification API",
+		"description": "Postman collection for testing the vShield fullstack verification server API endpoints including user session authorization, candidates CRUD, mock Government identity validations, system auditing transaction logs, and compiled PDF reports.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"HR Admin\",\n  \"email\": \"admin@vshield.co\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();",
+									"if (responseJson && responseJson.data && responseJson.data.token) {",
+									"    pm.environment.set(\"token\", responseJson.data.token);",
+									"    console.log(\"Saved auth token:\", responseJson.data.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@vshield.co\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile (Me)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Candidates",
+			"item": [
+				{
+					"name": "Register Candidate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();",
+									"if (responseJson && responseJson.data && responseJson.data.candidate && responseJson.data.candidate.id) {",
+									"    pm.environment.set(\"candidateId\", responseJson.data.candidate.id);",
+									"    console.log(\"Saved candidateId:\", responseJson.data.candidate.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Aditya Chopra\",\n  \"email\": \"aditya@vshield.co\",\n  \"phone\": \"+919876543210\",\n  \"aadhaarNumber\": \"123456789012\",\n  \"panNumber\": \"ABCDE1234F\",\n  \"dob\": \"1995-08-15\",\n  \"address\": \"123 Main Street, New Delhi, 110001\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/candidates",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"candidates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Candidates Directory List",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/candidates?page=1&limit=10&search=&status=",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"candidates"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Candidate Details file",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/candidates/{{candidateId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"candidates",
+								"{{candidateId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Candidate Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"Aditya Chopra\",\n  \"email\": \"adityachopra@vshield.co\",\n  \"phone\": \"+919876543210\",\n  \"aadhaarNumber\": \"123456789012\",\n  \"panNumber\": \"ABCDE1234F\",\n  \"dob\": \"1995-08-15\",\n  \"address\": \"Apt 4B, 123 Main Street, New Delhi, 110001\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/candidates/{{candidateId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"candidates",
+								"{{candidateId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Candidate File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/candidates/{{candidateId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"candidates",
+								"{{candidateId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Verification Gateways",
+			"item": [
+				{
+					"name": "Start Verification pipeline",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/verifications/{{candidateId}}/start",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"verifications",
+								"{{candidateId}}",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit System Logs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/verifications/logs?page=1&limit=20",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"verifications",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Get Candidate Verification Report",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/{{candidateId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"reports",
+								"{{candidateId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "localhost:5001",
+			"type": "string"
+		},
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5001/api",
+			"type": "string"
+		}
+	]
+}

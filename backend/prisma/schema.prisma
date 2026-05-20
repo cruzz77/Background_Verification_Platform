@@ -1,0 +1,67 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum CandidateStatus {
+  PENDING
+  VERIFIED
+  FAILED
+  PARTIAL
+}
+
+enum VerificationStatus {
+  SUCCESS
+  FAILED
+}
+
+model User {
+  id           String      @id @default(uuid())
+  name         String
+  email        String      @unique
+  passwordHash String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  candidates   Candidate[]
+}
+
+model Candidate {
+  id            String            @id @default(uuid())
+  fullName      String
+  email         String
+  phone         String
+  aadhaarNumber String
+  panNumber     String
+  dob           String
+  address       String
+  status        CandidateStatus   @default(PENDING)
+  createdById   String
+  createdBy     User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  logs          VerificationLog[]
+  reports       Report[]
+}
+
+model VerificationLog {
+  id                 String             @id @default(uuid())
+  candidateId        String
+  candidate          Candidate          @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  verificationType   String             // "AADHAAR", "PAN"
+  requestPayload     Json
+  responsePayload    Json
+  verificationStatus VerificationStatus
+  verifiedAt         DateTime           @default(now())
+}
+
+model Report {
+  id          String    @id @default(uuid())
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  reportUrl   String
+  generatedAt DateTime  @default(now())
+}

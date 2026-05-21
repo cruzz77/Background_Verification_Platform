@@ -12,6 +12,13 @@
 
 ---
 
+## Example Login Credentials 
+
+Email: test@gmail.com
+Password: 1234567
+
+---
+
 # Overview
 
 vShield is a full-stack enterprise-grade Background Verification Platform built to streamline candidate identity verification workflows for recruiters, HR teams, and organizations.
